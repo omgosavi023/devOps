@@ -66,7 +66,36 @@ echo "running image..."
 sudo docker run -it $imgname
 
 }
+function c() {
+echo "Enter a directory name "
+read dirname
+mkdir $dirname
+cd  $dirname
+pwd
+echo "
+#include<stdio.h>
+int main() {
+printf(\"Hello from C\");
+}
+" > hello.c
 
+echo "
+FROM gcc:latest AS build
+WORKDIR  /app
+COPY hello.c .
+RUN gcc hello.c -o hello
+CMD [\"./hello\"]
+" > Dockerfile
+echo "Enter image name"
+read imgname
+clear
+echo "creating image..."
+sudo docker build -t $imgname .
+echo "running image..."
+sudo docker run -it $imgname
+echo "exit..."
+
+}
 case "$img" in
 
 	1)
@@ -79,6 +108,7 @@ case "$img" in
 		;;
 	3)
 		echo "C"
+		c
 		;;
 	4) 
 		echo "SQL"
