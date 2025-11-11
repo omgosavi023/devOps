@@ -30,6 +30,42 @@ sudo docker run -it $imgname
 echo "exit..."
 }
 
+function java() {
+echo "Provide a directory name"
+read dt
+mkdir $dt
+cd $dt
+pwd
+echo "creating java file"
+echo "
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println(\"Hello, World! from Java\");
+    }
+}
+" > HelloWorld.java
+echo "creating java docker"
+echo "
+FROM eclipse-temurin:17-jdk-focal AS build
+WORKDIR /src
+COPY HelloWorld.java .
+RUN javac HelloWorld.java
+
+FROM eclipse-temurin:17-jre-focal
+WORKDIR /app
+COPY --from=build /src/HelloWorld.class .
+CMD [\"java\", \"HelloWorld\"]
+" > Dockerfile
+
+echo "Enter a image name"
+read imgname
+clear
+echo "creating image..."
+sudo docker build -t $imgname .
+echo "running image..."
+sudo docker run -it $imgname
+
+}
 
 case "$img" in
 
@@ -39,6 +75,7 @@ case "$img" in
 		;;
 	2)	
 		echo "Java"
+		java
 		;;
 	3)
 		echo "C"
